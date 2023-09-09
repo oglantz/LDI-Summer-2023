@@ -20,4 +20,3 @@ for i in lst:
     ws.append(i)
 
 wb.save('test.xlsx')
-
