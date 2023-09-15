@@ -2,6 +2,8 @@ import openpyxl
 from openpyxl import Workbook
 from pycel.excelcompiler import ExcelCompiler
 from copy import copy
+from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
+from openpyxl.utils import get_column_letter
 from file_grabber import get_xl_files
 
 class SheetReaderWriter:
@@ -58,6 +60,15 @@ class SheetReaderWriter:
                 if self.cell_has_formula(cell.coordinate):
                     new_cell.value = self.evaluate(cell.coordinate)
 
+    def _format_widths(self):
+        ws = self._final_sheet
+        dim_holder = DimensionHolder(worksheet = ws)
+
+        for col in range(ws.min_column, ws.max_column + 1):
+            dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=20)
+
+        ws.column_dimensions = dim_holder
+
     def _save_result(self):
         self._final_book.save(self._final_file)
         print(f"File saved as {self._final_file}")
@@ -71,6 +82,7 @@ class SheetReaderWriter:
             self._transfer_cells('A1', 'L4')
             self._file_count += 7
 
+        self._format_widths()
         self._save_result()
 
 
