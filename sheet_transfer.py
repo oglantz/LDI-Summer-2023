@@ -4,6 +4,7 @@ from pycel.excelcompiler import ExcelCompiler
 from copy import copy
 from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 from openpyxl.utils import get_column_letter
+from tqdm import tqdm
 from file_grabber import get_xl_files
 
 class SheetReaderWriter:
@@ -47,9 +48,6 @@ class SheetReaderWriter:
     def return_cell(self, address):
         return self._current_book[self._read_sheet][address].value
 
-    # def collect_range_of_cells(self, start_cell, end_cell):
-    #     return self._book[self._sheet][start_cell: end_cell]
-
     def _transfer_cells(self, start_cell, end_cell):
         for row in self._read_sheet[start_cell:end_cell]:
             for cell in row:
@@ -74,7 +72,7 @@ class SheetReaderWriter:
         print(f"File saved as {self._final_file}")
 
     def cycle_through_sheets(self):
-        for file in self._file_list:
+        for file in tqdm(self._file_list):
             self._current_file = file
             self._current_book = openpyxl.load_workbook(file)
             self._read_sheet = self._current_book.active
@@ -88,8 +86,3 @@ class SheetReaderWriter:
 
 
 
-
-
-if __name__ == "__main__":
-    sheet_reader = SheetReaderWriter('result.xlsx', get_xl_files())
-    sheet_reader.cycle_through_sheets()
