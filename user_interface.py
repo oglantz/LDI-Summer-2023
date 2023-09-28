@@ -34,18 +34,13 @@ class Window:
     def _create_sheet(self):
         try:
             sheet_name = self.result_file_name_input.get(1.0, "end-1c")
-            list_of_files = [str(f) for f in self.chosen_dir_path.iterdir() if f.is_file]
+            list_of_files = [f for f in self.chosen_dir_path.iterdir() if f.is_file]
             sheet_creator = sheet_transfer.SheetReaderWriter(sheet_name, list_of_files)
             sheet_creator.cycle_through_sheets()
+            self.window.destroy()
         except Exception as e:
             tkinter.messagebox.showerror("Error", f"Unexpected error! Details below\n{type(e)}\n{e}")
 
 
     def run(self):
         self.window.mainloop()
-
-
-if __name__ == "__main__":
-    window = Window()
-    window.run()
-
