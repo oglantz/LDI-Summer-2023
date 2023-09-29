@@ -34,7 +34,7 @@ class Window:
     def _create_sheet(self):
         try:
             sheet_name = self.result_file_name_input.get(1.0, "end-1c")
-            list_of_files = [f for f in self.chosen_dir_path.iterdir() if f.is_file]
+            list_of_files = [f for f in self.chosen_dir_path.iterdir() if f.is_file and f.suffix == ".xlsx"]
             sheet_creator = sheet_transfer.SheetReaderWriter(sheet_name, list_of_files)
             sheet_creator.cycle_through_sheets()
             self.window.destroy()
