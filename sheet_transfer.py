@@ -22,30 +22,25 @@ class SheetReaderWriter:
         self._final_sheet = self._final_book.active
         self._file_count = 0
 
-    # def get_cell_value(self, address: str):
-    #     if self.cell_has_formula(address):
-    #         return self.evaluate(address)
-    #     else:
-    #         return self.return_cell(address)
+        self.ACCOUNTING_STYLE = '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
+        self.CURRENCY_STYLE = '"$"#,##0.00'
+        self.overall_total = 0
 
-    # def cell_has_formula(self, address: str):
-    #     cell = self._read_sheet[address]
-    #     if type(cell.value) == str and cell.value[0] == "=":
-    #         return True
-    #     else:
-    #         return False
-
-    def cell_has_formatting(self, new_cell, old_cell):
-        new_cell.font = copy(old_cell.font)
-        new_cell.border = copy(old_cell.border)
-        new_cell.fill = copy(old_cell.fill)
-        new_cell.number_format = copy(old_cell.number_format)
-        new_cell.protection = copy(old_cell.protection)
-        new_cell.alignment = copy(old_cell.alignment)
-
-    # def evaluate(self, address):
-    #     compiler = ExcelCompiler(self._current_file)
-    #     return compiler.evaluate(f"{self._eval_sheet}!{address}")
+    def cell_has_formatting(self, new_cell, old_cell, total = False):
+        if total:
+            new_cell.font = copy(old_cell.font)
+            new_cell.fill = copy(old_cell.fill)
+            new_cell.number_format = copy(old_cell.number_format)
+            new_cell.protection = copy(old_cell.protection)
+            new_cell.alignment = copy(old_cell.alignment)
+            return
+        else:
+            new_cell.font = copy(old_cell.font)
+            new_cell.border = copy(old_cell.border)
+            new_cell.fill = copy(old_cell.fill)
+            new_cell.number_format = copy(old_cell.number_format)
+            new_cell.protection = copy(old_cell.protection)
+            new_cell.alignment = copy(old_cell.alignment)
 
     def return_cell(self, address):
         return self._current_book[self._read_sheet][address].value
@@ -57,8 +52,11 @@ class SheetReaderWriter:
                                                   column = cell.col_idx, value = cell.value)
                 if cell.has_style:
                     self.cell_has_formatting(new_cell, cell)
-                # if self.cell_has_formula(cell.coordinate):
-                #     new_cell.value = self.evaluate(cell.coordinate)
+                if cell.number_format == self.CURRENCY_STYLE:
+                    self.overall_total += cell.value
+                if cell.number_format == self.ACCOUNTING_STYLE:
+                    self.overall_total += cell.value
+
 
     def _format_widths(self):
         ws = self._final_sheet
@@ -68,6 +66,17 @@ class SheetReaderWriter:
             dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=20)
 
         ws.column_dimensions = dim_holder
+
+    def _display_total(self):
+        total_label = self._final_sheet.cell(row = self._file_count + 1,
+                               column = 2, value = "Overall Total:")
+        sample_row = str(self._file_count - 4)
+        sample_col = "B"
+        self.cell_has_formatting(total_label, self._final_sheet[sample_col + sample_row], True)
+
+        total_num = self._final_sheet.cell(row = self._file_count + 1,
+                               column = 3, value = round(self.overall_total, 2))
+        total_num.number_format = self.ACCOUNTING_STYLE
 
     def _save_result(self):
         self._final_book.save(self._final_file + ".xlsx")
@@ -81,5 +90,6 @@ class SheetReaderWriter:
             self._eval_sheet = self._current_book.sheetnames[0]
             self._transfer_cells('A1', 'L4')
             self._file_count += 7
+        self._display_total()
         self._format_widths()
         self._save_result()
