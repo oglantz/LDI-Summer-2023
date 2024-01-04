@@ -9,7 +9,7 @@ class Window:
         self.window = tk.Tk()
         self.window.title("LDI Budget Spreadsheet Tool")
         self.chosen_dir_path = None
-        intro_text = tk.Label(self.window, text = "Welcome to the LDI Budged Spreadsheet Tool!")
+        intro_text = tk.Label(self.window, text = "Welcome to the LDI Budget Spreadsheet Tool!")
         intro_text.grid(row = 0, column = 0, pady = 2, columnspan = 3)
         directory_frame = tk.Frame(self.window)
         directory_frame.grid(row = 1, column = 1, pady = 2)
