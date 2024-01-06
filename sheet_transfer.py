@@ -52,10 +52,11 @@ class SheetReaderWriter:
                                                   column = cell.col_idx, value = cell.value)
                 if cell.has_style:
                     self.cell_has_formatting(new_cell, cell)
-                if cell.number_format == self.CURRENCY_STYLE:
-                    self.overall_total += cell.value
-                if cell.number_format == self.ACCOUNTING_STYLE:
-                    self.overall_total += cell.value
+                if cell.col_idx == 11:
+                    if cell.number_format == self.CURRENCY_STYLE:
+                        self.overall_total += cell.value
+                    if cell.number_format == self.ACCOUNTING_STYLE:
+                        self.overall_total += cell.value
 
 
     def _format_widths(self):
